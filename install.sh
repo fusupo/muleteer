@@ -56,6 +56,17 @@ if [ -d "$SCRIPT_DIR/agents" ]; then
     done
 fi
 
+# Install scripts
+echo "📜 Installing scripts..."
+if [ -d "$SCRIPT_DIR/scripts" ]; then
+    for script in "$SCRIPT_DIR"/scripts/*.sh; do
+        if [ -f "$script" ]; then
+            chmod +x "$script"
+            echo "  ✓ Made executable: $(basename "$script")"
+        fi
+    done
+fi
+
 # Handle CLAUDE.md
 echo "📝 Installing Muleteer context..."
 if [ -f "$SCRIPT_DIR/CLAUDE-MULETEER.md" ]; then
@@ -90,5 +101,12 @@ echo "   - \"Setup issue #42\"        → issue-setup skill"
 echo "   - \"Commit these changes\"   → commit-changes skill"
 echo "   - \"Create a PR\"            → create-pr skill"
 echo "   - \"Start working on this\"  → work-session skill"
+echo ""
+echo "📜 Scripts available:"
+[ -d "$SCRIPT_DIR/scripts" ] && ls -1 "$SCRIPT_DIR"/scripts/*.sh 2>/dev/null | xargs -n1 basename | sed 's/^/   - /' || echo "   (none)"
+echo ""
+echo "📋 To enable session archiving before auto-compaction:"
+echo "   See: ~/.muleteer/docs/SESSION-ARCHIVING.md"
+echo "   Template: ~/.muleteer/templates/hooks-config.json"
 echo ""
 echo "🚀 Start using: Open Claude Code in any project repo"

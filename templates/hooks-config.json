@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PreCompact": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.muleteer/scripts/archive-session-log.sh",
+            "timeout": 60
+          }
+        ]
+      }
+    ]
+  }
+}
