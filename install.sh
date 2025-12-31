@@ -56,6 +56,68 @@ if [ -d "$SCRIPT_DIR/agents" ]; then
     done
 fi
 
+# Install scripts
+echo "📜 Installing scripts..."
+if [ -d "$SCRIPT_DIR/scripts" ]; then
+    for script in "$SCRIPT_DIR"/scripts/*.sh; do
+        if [ -f "$script" ]; then
+            chmod +x "$script"
+            echo "  ✓ Made executable: $(basename "$script")"
+        fi
+    done
+fi
+
+# Configure hooks in settings.json
+echo "🪝 Configuring hooks..."
+SETTINGS_FILE=~/.claude/settings.json
+
+# Create settings.json if it doesn't exist
+if [ ! -f "$SETTINGS_FILE" ]; then
+    echo "{}" > "$SETTINGS_FILE"
+fi
+
+# Check if PreCompact hook is already configured
+if command -v jq &> /dev/null; then
+    if ! jq -e '.hooks.PreCompact' "$SETTINGS_FILE" > /dev/null 2>&1; then
+        # Add PreCompact hook using jq (need both manual and auto matchers)
+        HOOK_CONFIG='{
+          "hooks": {
+            "PreCompact": [
+              {
+                "matcher": "manual",
+                "hooks": [
+                  {
+                    "type": "command",
+                    "command": "~/.muleteer/scripts/archive-session-log.sh",
+                    "timeout": 60
+                  }
+                ]
+              },
+              {
+                "matcher": "auto",
+                "hooks": [
+                  {
+                    "type": "command",
+                    "command": "~/.muleteer/scripts/archive-session-log.sh",
+                    "timeout": 60
+                  }
+                ]
+              }
+            ]
+          }
+        }'
+
+        # Merge hook config into existing settings
+        jq --argjson hook "$HOOK_CONFIG" '. * $hook' "$SETTINGS_FILE" > "$SETTINGS_FILE.tmp" && \
+            mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
+        echo "  ✓ Added PreCompact hook for session archiving"
+    else
+        echo "  ℹ PreCompact hook already configured (skipped)"
+    fi
+else
+    echo "  ⚠ jq not found - please manually add hook from templates/hooks-config.json"
+fi
+
 # Handle CLAUDE.md
 echo "📝 Installing Muleteer context..."
 if [ -f "$SCRIPT_DIR/CLAUDE-MULETEER.md" ]; then
@@ -90,5 +152,13 @@ echo "   - \"Setup issue #42\"        → issue-setup skill"
 echo "   - \"Commit these changes\"   → commit-changes skill"
 echo "   - \"Create a PR\"            → create-pr skill"
 echo "   - \"Start working on this\"  → work-session skill"
+echo ""
+echo "📜 Scripts available:"
+[ -d "$SCRIPT_DIR/scripts" ] && ls -1 "$SCRIPT_DIR"/scripts/*.sh 2>/dev/null | xargs -n1 basename | sed 's/^/   - /' || echo "   (none)"
+echo ""
+echo "🪝 Session archiving:"
+echo "   PreCompact hook auto-configured in ~/.claude/settings.json"
+echo "   Run /compact to archive session logs before compaction"
+echo "   Docs: ~/.muleteer/docs/SESSION-ARCHIVING.md"
 echo ""
 echo "🚀 Start using: Open Claude Code in any project repo"
