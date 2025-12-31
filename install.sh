@@ -79,12 +79,22 @@ fi
 # Check if PreCompact hook is already configured
 if command -v jq &> /dev/null; then
     if ! jq -e '.hooks.PreCompact' "$SETTINGS_FILE" > /dev/null 2>&1; then
-        # Add PreCompact hook using jq
+        # Add PreCompact hook using jq (need both manual and auto matchers)
         HOOK_CONFIG='{
           "hooks": {
             "PreCompact": [
               {
-                "matcher": "*",
+                "matcher": "manual",
+                "hooks": [
+                  {
+                    "type": "command",
+                    "command": "~/.muleteer/scripts/archive-session-log.sh",
+                    "timeout": 60
+                  }
+                ]
+              },
+              {
+                "matcher": "auto",
                 "hooks": [
                   {
                     "type": "command",

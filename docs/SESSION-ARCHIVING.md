@@ -33,6 +33,16 @@ Add the following to your Claude Code settings file:
   "hooks": {
     "PreCompact": [
       {
+        "matcher": "manual",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.muleteer/scripts/archive-session-log.sh",
+            "timeout": 60
+          }
+        ]
+      },
+      {
         "matcher": "auto",
         "hooks": [
           {
@@ -128,11 +138,10 @@ The `matcher` field controls when the hook fires:
 
 | Value | Description |
 |-------|-------------|
-| `"*"` | Both auto and manual (recommended) |
-| `"auto"` | Only auto-compaction |
 | `"manual"` | Only manual /compact commands |
+| `"auto"` | Only auto-compaction |
 
-The default template uses `"*"` so you can capture sessions both automatically (when context fills) and manually (when you run `/compact` after completing work).
+**Note:** Unlike other Claude Code hooks, PreCompact does NOT support `"*"` wildcard. To capture both auto and manual compaction, you must include **two separate matcher entries** (as shown in the configuration above). The default template includes both.
 
 ### Timeout
 
