@@ -1,8 +1,7 @@
 # Claude Code local settings
 .claude/
 
-# Session-specific files (created in projects, not the plugin)
-SCRATCHPAD_*.md
+# Session logs (created in user projects)
 SESSION_LOG_*.md
 
 # OS files
