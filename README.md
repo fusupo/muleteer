@@ -11,6 +11,17 @@ Muleteer is a Claude Code plugin that provides reusable workflow modules to stre
 - **Agents**: Specialized AI assistants (extensibility ready)
 - **Multi-Project Support**: Works across all your repos simultaneously
 
+## Workflow Overview
+
+Muleteer guides you from idea to merged code through a structured workflow:
+
+1. **Initialize** (`issue-setup`) - Pull GitHub issue → Generate scratchpad plan → Create feature branch
+2. **Execute** (`work-session` + `commit-changes`) - Work through scratchpad tasks → Make atomic commits
+3. **Review** (`create-pr` + `review-pr`) - Create pull request → Review changes → Merge
+4. **Archive** (`archive-work`) - Clean up scratchpad → Preserve session history
+
+Each phase is handled by specialized skills that activate via natural language or explicit commands.
+
 ## Workflow Diagram
 
 ![Muleteer Workflow](/workflow.png "Development workflow from idea to merge")
