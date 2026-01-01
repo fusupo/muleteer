@@ -1,6 +1,6 @@
 ---
 name: issue-setup
-description: Setup development environment from GitHub issue. Invoke when user says "setup issue #X", "start issue #X", "prepare issue #X", or provides a GitHub issue URL.
+description: Setup development environment from GitHub issue. Invoke when user says "init work on issue #X", "initialize issue #X", "setup issue #X", "prepare issue #X", "start fresh on issue #X", "start new work on issue #X", or provides a GitHub issue URL.
 tools:
   - mcp__github__*
   - mcp__linear__*
@@ -38,6 +38,34 @@ Read the project's CLAUDE.md to understand:
 Get a high-level view of the repository structure to identify affected areas.
 
 ## Workflow Execution
+
+### Phase 0: Check Existing Context (Self-Correction)
+
+**Before proceeding with setup, check if work already initialized:**
+
+1. **Detect existing scratchpad:**
+   ```bash
+   # Look for SCRATCHPAD_{issue_number}.md
+   ls SCRATCHPAD_*.md 2>/dev/null
+   ```
+
+2. **If scratchpad exists:**
+   ```
+   ✓ Scratchpad already exists for this issue.
+
+   Delegating to work-session skill...
+   ```
+
+   Then invoke:
+   ```
+   Skill: work-session
+   args: "{issue_number}"
+   ```
+
+   **STOP here** - don't proceed with setup.
+
+3. **If no scratchpad:**
+   - Proceed to Phase 1 (normal setup flow)
 
 ### Phase 1: Gather Context (Parallel)
 

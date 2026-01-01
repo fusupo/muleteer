@@ -1,6 +1,6 @@
 ---
 name: work-session
-description: Execute development work from a scratchpad, tracking progress with TodoWrite and making atomic commits. Invoke when user says "start working", "continue work", "work on issue #X", or "resume work".
+description: Execute development work from a scratchpad, tracking progress with TodoWrite and making atomic commits. Invoke when user says "start work on issue #X", "do work on issue #X", "work on issue #X", "continue work", "resume work", or "keep working".
 tools:
   - Read
   - Edit
@@ -25,29 +25,67 @@ Execute implementation work from a scratchpad in a structured, trackable way. Th
 ## Natural Language Triggers
 
 This skill activates when the user says things like:
-- "Start working on issue #42"
+- "Start work on issue #42" (default trigger)
+- "Do work on issue #42"
+- "Work on issue #42"
 - "Continue work on this issue"
 - "Resume work"
+- "Keep working"
 - "Let's work through the scratchpad"
-- "Start implementation"
 - "Work on the next task"
 - "Pick up where we left off"
 
 ## Workflow Execution
 
-### Phase 1: Validate Setup
+### Phase 0: Check Scratchpad Exists (Self-Correction)
+
+**Before proceeding with work, verify scratchpad exists:**
 
 1. **Detect Scratchpad:**
    - Look for `SCRATCHPAD_{issue_number}.md` in project root
    - If issue number provided, look for specific scratchpad
-   - If not found, suggest running `issue-setup` skill first
 
-2. **Load Scratchpad:**
+2. **If scratchpad NOT found:**
+   ```
+   ❌ No scratchpad found for issue #{number}
+
+   Would you like to run issue-setup first?
+   ```
+
+   Use AskUserQuestion:
+   ```
+   AskUserQuestion:
+     questions:
+       - question: "No scratchpad found. Run issue-setup to initialize?"
+         header: "Setup Required"
+         multiSelect: false
+         options:
+           - label: "Yes, run issue-setup"
+             description: "Create scratchpad and branch for this issue"
+           - label: "No, create manually"
+             description: "I'll set up the scratchpad myself"
+   ```
+
+   If user chooses "Yes":
+   ```
+   Skill: issue-setup
+   args: "{issue_number}"
+   ```
+
+   **STOP here** - issue-setup will create scratchpad and can chain to work-session after.
+
+3. **If scratchpad exists:**
+   - Proceed to Phase 1 (normal work flow)
+
+### Phase 1: Validate Setup
+
+1. **Load Scratchpad:**
+   - Scratchpad confirmed to exist from Phase 0
    - Read full scratchpad content
    - Parse implementation checklist
    - Identify completed vs pending tasks
 
-3. **Verify Branch:**
+2. **Verify Branch:**
    - Check current branch matches expected feature branch
    - If not, offer to switch:
      ```
