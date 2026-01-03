@@ -53,12 +53,12 @@ Get a high-level view of the repository structure to identify affected areas.
    ```
    ✓ Scratchpad already exists for this issue.
 
-   Delegating to work-session skill...
+   Delegating to do-work skill...
    ```
 
    Then invoke:
    ```
-   Skill: work-session
+   Skill: do-work
    args: "{issue_number}"
    ```
 
